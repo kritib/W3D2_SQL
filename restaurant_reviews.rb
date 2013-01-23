@@ -52,7 +52,7 @@ end
 
 def add_tenure(chef_id, restaurant_id, start_date, end_date)
   RestaurantReviewsDB.instance.execute(
-    "INSERT INTO head_chef_tenures ('chef_id', 'restaurant_id', 'start_date', 'end_date')
+    "INSERT INTO tenures ('chef_id', 'restaurant_id', 'start_date', 'end_date')
     VALUES (?, ?, ?, ?)", chef_id, restaurant_id, start_date, end_date)
 end
 
@@ -109,6 +109,17 @@ def get_restaurant_reviews(restaurant)
     JOIN reviews
     ON restaurants.id = reviews.restaurant_id
     WHERE restaurants.name = (?)", restaurant)
+end
+
+def get_avg_chef_review(chef)
+  RestaurantReviewsDB.instance.execute(
+    "SELECT AVG(score)
+    FROM tenures
+    JOIN chefs
+    ON tenures.chef_id = chefs.id
+    JOIN reviews
+    ON tenures.restaurant_id = reviews.restaurant_id and reviews.date_of_review BETWEEN tenures.start_date AND tenures.end_date
+    WHERE chefs.first_name = (?) and chefs.last_name = (?)", chef.split[0], chef.split[1])
 end
 
 
